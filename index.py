@@ -1,83 +1,46 @@
-class Book:
-    def __init__(self, title, author, year):
-        self.title = title
-        self.author = author
-        self.year = year
+import os
+import json
 
-    def __str__(self):
-        return f"{self.title} by {self.author} ({self.year})"
+# Create a directory for the digital library
+library_dir = os.path.join(os.getcwd(), "library")
+os.mkdir(library_dir)
 
+# Create a file to store the library metadata
+metadata_file = os.path.join(library_dir, "metadata.json")
+with open(metadata_file, "w") as f:
+    json.dump({}, f)
 
-class Library:
-    def __init__(self):
-        self.books = []
+# Create a function to add a book to the library
+def add_book(title, author, file_path):
+    """Adds a book to the digital library.
 
-    def add_book(self, book):
-        self.books.append(book)
+    Args:
+        title (str): The title of the book.
+        author (str): The author of the book.
+        file_path (str): The path to the book file.
+    """
 
-    def display_books(self):
-        if not self.books:
-            print("No books in the library.")
-        else:
-            print("Available books in the library:")
-            for i, book in enumerate(self.books, 1):
-                print(f"{i}. {book}")
+    # Get the library metadata
+    with open(metadata_file, "r") as f:
+        metadata = json.load(f)
 
-    def search_by_title(self, title):
-        found_books = [book for book in self.books if title.lower() in book.title.lower()]
-        if found_books:
-            print("Matching books:")
-            for i, book in enumerate(found_books, 1):
-                print(f"{i}. {book}")
-        else:
-            print("No matching books found.")
+    # Add the book to the metadata
+    metadata["books"].append({
+        "title": title,
+        "author": author,
+        "file_path": file_path,
+    })
 
-    def search_by_author(self, author):
-        found_books = [book for book in self.books if author.lower() in book.author.lower()]
-        if found_books:
-            print("Books by the author:")
-            for i, book in enumerate(found_books, 1):
-                print(f"{i}. {book}")
-        else:
-            print("No books by the author found.")
+    # Save the library metadata
+    with open(metadata_file, "w") as f:
+        json.dump(metadata, f)
 
+# Add a few books to the library
+add_book("The Hitchhiker's Guide to the Galaxy", "Douglas Adams", "hitchhikers_guide.pdf")
+add_book("The Lord of the Rings", "J.R.R. Tolkien", "lord_of_the_rings.pdf")
+add_book("The Great Gatsby", "F. Scott Fitzgerald", "great_gatsby.pdf")
 
-def main():
-    library = Library()
-
-    book1 = Book("Harry Potter and the Sorcerer's Stone", "J.K. Rowling", 1997)
-    book2 = Book("To Kill a Mockingbird", "Harper Lee", 1960)
-    book3 = Book("1984", "George Orwell", 1949)
-
-    library.add_book(book1)
-    library.add_book(book2)
-    library.add_book(book3)
-
-    print("Welcome to the Digital Library!")
-
-    while True:
-        print("\nMenu:")
-        print("1. Display all books")
-        print("2. Search books by title")
-        print("3. Search books by author")
-        print("4. Exit")
-
-        choice = input("Enter your choice: ")
-
-        if choice == "1":
-            library.display_books()
-        elif choice == "2":
-            title = input("Enter the title to search: ")
-            library.search_by_title(title)
-        elif choice == "3":
-            author = input("Enter the author's name to search: ")
-            library.search_by_author(author)
-        elif choice == "4":
-            print("Goodbye! Exiting the Digital Library.")
-            break
-        else:
-            print("Invalid choice. Please try again.")
-
-
-if __name__ == "__main__":
-    main()
+# Print the library metadata
+with open(metadata_file, "r") as f:
+    metadata = json.load(f)
+    print(metadata)
